@@ -1,59 +1,58 @@
 <?php
-  header("Access-Control-Allow-Origin: *");  /
-  header("Access-Control-Allow-Methods: POST, OPTIONS");
-  header("Access-Control-Allow-Headers: Content-Type");
-  header("Content-Type: application/json");
 
-  require_once('../config/config.php');
-  require_once('../config/database.php');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { 
+header("Access-Control-Allow-Origin: http://localhost:3000"); 
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
-  }
+}
 
-  // retrieve the request body as a string
-  $request_body = file_get_contents('php://input'); 
+require_once('../config/database.php');
 
-  // Decode the JSON data into a PHP array
-  $data = json_decode($request_body, true);
+$data = json_decode(file_get_contents('php://input'), true);
 
-  // Validate input fields with basic validation
-  if (empty($data['title']) || empty($data['content']) || empty($data['author']) ) {
-    http_response_code(400);
-    echo json_encode(['message' => 'Error: Missing or empty required parameter']);
+if (!$data) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Invalid JSON input"
+    ]);
     exit();
-  }
+}
 
-  // Validate input fields
-  if (!isset($data['title']) || !isset($data['content']) || !isset($data['author']) ) {
-    http_response_code(400);
-    die(json_encode(['message' => 'Error: Missing required parameter']));
-  }
+$name = $data['name'] ?? '';
+$location = $data['location'] ?? '';
+$date = $data['date'] ?? '';
+$time = $data['time'] ?? '';
 
-  // Sanitize input
-  $title = filter_var($data['title'], FILTER_SANITIZE_STRING);
-  $content = filter_var($data['content'], FILTER_SANITIZE_STRING);
-  $author = filter_var($data['author'], FILTER_SANITIZE_STRING);
+if (!$name || !$location || !$date || !$time) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Missing required fields"
+    ]);
+    exit();
+}
 
-  // Prepare statement
-  $stmt = $conn->prepare('INSERT INTO blog_posts (title, content, author) VALUES(?, ?, ?)');
-  $stmt->bind_param('sss', $title, $content, $author);
+$stmt = $conn->prepare("INSERT INTO reservations (name, location, date, time) VALUES (?, ?, ?, ?)");
+$stmt->bind_param("ssss", $name, $location, $date, $time);
 
-  // Execute statement
-  if ($stmt->execute()) {
-    $id = $stmt->insert_id;
+if ($stmt->execute()) {
+    echo json_encode([
+        "status" => "success",
+        "message" => "Reservation created successfully",
+        "reservationId" => $stmt->insert_id
+    ]);
+} else {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Failed to create reservation"
+    ]);
+}
 
-    // Return success response
-    http_response_code(201);
-    echo json_encode(['message' => 'Reservation created successfully', 'id' => $id]);
-  }
-  else{
-    // Return error response with more detail if possible
-    http_response_code(500);
-    echo json_encode(['message' => 'Reservation not created: ' . $stmt->error]);
-  }
-
-  $stmt->close();
-  $conn->close();
-?>
+$stmt->close();
+$conn->close();

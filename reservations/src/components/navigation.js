@@ -6,7 +6,6 @@ const Navbar = () => {
   return(
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
-        <Link className="navbar-brand" to="/">Raveena's Reservations</Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -28,7 +27,7 @@ const Navbar = () => {
             </li>
             <li className="nav-item me-5">
               <Link className={"nav-link" + (location.pathname === "/create-reservation" ? " active" : "")} 
-                to="/create-reservation">Add Reservation 
+                to="/create-reservation">Add New Reservation 
               </Link>            
             </li>
           </ul>
