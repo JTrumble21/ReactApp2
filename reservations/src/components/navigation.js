@@ -1,11 +1,14 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
- 
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+
 const Navbar = () => {
   const location = useLocation();
-  return(
+  return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
+        <Link className="navbar-brand" to="/">
+          Canada Parks Reservations
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -15,20 +18,33 @@ const Navbar = () => {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-        <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0 fs-5">
             <li className="nav-item me-5">
-              <Link 
-                className={"nav-link" + (location.pathname === "/" ? " active" : "")} 
+              <Link
+                className={"nav-link" + (location.pathname === "/" ? " active" : "")}
                 to="/"
-              >Home</Link>
+              >
+                Home
+              </Link>
             </li>
             <li className="nav-item me-5">
-              <Link className={"nav-link" + (location.pathname === "/create-reservation" ? " active" : "")} 
-                to="/create-reservation">Add New Reservation 
-              </Link>            
+              <Link
+                className={"nav-link" + (location.pathname === "/create-reservation" ? " active" : "")}
+                to="/create-reservation"
+              >
+                Add New Reservation
+              </Link>
+            </li>
+            <li className="nav-item me-5">
+              <Link
+                className={"nav-link" + (location.pathname === "/reservations" ? " active" : "")}
+                to="/reservations"
+              >
+                View Reservations
+              </Link>
             </li>
           </ul>
         </div>
@@ -36,5 +52,5 @@ const Navbar = () => {
     </nav>
   );
 };
- 
+
 export default Navbar;

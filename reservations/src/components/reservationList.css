@@ -11,9 +11,11 @@
 
 .card img {
   border-radius: 8px;
-  max-height: 180px;
+  max-height: 120px;  
+  width: auto;   
   object-fit: cover;
 }
+
 
 .card-body {
   display: flex;
