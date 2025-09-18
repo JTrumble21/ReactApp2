@@ -1,5 +1,5 @@
 <?php
-ini_set('display_errors', 0); // hide PHP warnings/notices
+ini_set('display_errors', 0); 
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -9,16 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once('../config/database.php'); // your connection
+require_once('../config/database.php');
 
 $name = $_POST['name'] ?? '';
 $location = $_POST['location'] ?? '';
 $date = $_POST['date'] ?? '';
 $time = $_POST['time'] ?? '';
-$photoName = "placeholder.jpg"; // default placeholder
+$photoName = "placeholder.jpg";
 
-// Handle uploaded photo
-if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+if (!empty($_FILES['photo']) && isset($_FILES['photo']['error']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = __DIR__ . "/uploads/";
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
@@ -26,13 +25,11 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     move_uploaded_file($_FILES['photo']['tmp_name'], $uploadDir . $photoName);
 }
 
-// Validate required fields
 if (!$name || !$location || !$date || !$time) {
     echo json_encode(["status" => "error", "message" => "All fields are required"]);
     exit();
 }
 
-// Insert into database
 $stmt = $conn->prepare("INSERT INTO reservations (name, location, date, time, photo) VALUES (?, ?, ?, ?, ?)");
 $stmt->bind_param("sssss", $name, $location, $date, $time, $photoName);
 

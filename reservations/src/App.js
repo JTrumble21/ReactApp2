@@ -1,48 +1,36 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/navigation";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import Navigation from "./components/navigation";
+import Register from "./components/register";
+import Login from "./components/login";
 import CreateReservation from "./components/createReservation";
-import ReservationList from "./components/reservationList";
-import reservationsData from "./components/reservations";
+import ReservationsPage from "./components/reservationPage";
 
 function App() {
-  const [reservations, setReservations] = useState(reservationsData);
+  const [user, setUser] = useState(null);
 
-  const addReservation = (reservation) => {
-    setReservations([...reservations, reservation]);
-  };
-
-  const deleteReservation = (id) => {
-    setReservations(reservations.filter((r) => r.id !== id));
+  const handleLogin = (userData) => {
+    setUser(userData);
   };
 
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route
-          path="/create-reservation"
-          element={<CreateReservation addReservation={addReservation} />}
-        />
-        <Route
-          path="/reservations"
-          element={
-            <ReservationList
-              reservations={reservations}
-              deleteReservation={deleteReservation}
-            />
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <div className="container mt-5">
-              <h1>Welcome to Canada Parks Reservations</h1>
-            </div>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <div className="App">
+      <BrowserRouter>
+        <Navigation user={user} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/reservations" />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/reservations" element={<ReservationsPage />} />
+          <Route
+            path="/create-reservation"
+            element={user ? <CreateReservation /> : <Navigate to="/login" />}
+          />
+          <Route path="*" element={<h2 className="text-center mt-5">Page not found</h2>} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 
